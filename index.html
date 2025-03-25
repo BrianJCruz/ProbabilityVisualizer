@@ -1,0 +1,447 @@
+<html><head><base href="https://advanced-probability-visualizer.com">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualizador de Probabilidades con Cartas</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #f0f0f0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23000000' fill-opacity='0.1' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 2em;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    #input-container {
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 600px;
+    }
+    #probability-input {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 25px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    #probability-input:focus {
+      outline: none;
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+    #cards-container {
+      display: grid;
+      grid-template-columns: repeat(13, minmax(40px, 1fr));
+      grid-auto-rows: 85px; /* Altura fija para mantener la proporción */
+      gap: 5px;
+      width: 100%;
+      margin-bottom: 30px;
+      padding: 10px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .card {
+      width: 100%;
+      height: 102%;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .card::before {
+      content: attr(data-suit);
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      font-size: 10px;
+    }
+    .card::after {
+      content: attr(data-suit);
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      font-size: 10px;
+      transform: rotate(180deg);
+    }
+    .card.included {
+      background-color: rgba(46, 204, 113, 0.3);
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+    }
+    .card.excluded {
+      background-color: rgba(231, 76, 60, 0.3);
+      opacity: 0.7;
+    }
+    #result {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #2c3e50;
+      text-align: center;
+      padding: 15px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    #legend {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 600px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    #legend h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+    #legend ul {
+      list-style-type: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    #legend li {
+      margin-bottom: 10px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+    }
+    #legend svg {
+      margin-right: 10px;
+    }
+    /* Responsivo para dispositivos móviles */
+    @media (max-width: 768px) {
+      #cards-container {
+        grid-template-columns: repeat(13, minmax(30px, 1fr));
+        grid-auto-rows: 80px;
+      }
+      .card {
+        font-size: 12px;
+      }
+      .card::before,
+      .card::after {
+        font-size: 8px;
+      }
+    }
+    @media (max-width: 480px) {
+      #cards-container {
+        grid-template-columns: repeat(13, minmax(20px, 1fr));
+        grid-auto-rows: 50px;
+      }
+      .card {
+        font-size: 10px;
+      }
+      .card::before,
+      .card::after {
+        font-size: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Visualizador de Probabilidades con Cartas</h1>
+  <div id="input-container">
+    <input type="text" id="probability-input" placeholder="Ingrese la probabilidad ej: A | ~K, ~diamante | ~K">
+  </div>
+  <div id="cards-container"></div>
+  <div id="result">Probabilidad: 0% (0 / 52)</div>
+  <div id="legend">
+    <h2>Leyenda de Símbolos:</h2>
+    <h4><small style="font-weight: normal;">Usa los nombres de los símbolos en lugar de estos (solo para diamante, trébol, pica y corazón).</small></h4>
+    <ul>
+      <li><svg width="16" height="16"></svg> <strong>U</strong>: Unión (A U B)</li>
+      <li><svg width="16" height="16"></svg> <strong>∩</strong>: Intersección (A ∩ B)</li>
+      <li><svg width="16" height="16"></svg> <strong>~</strong>: Negación (~A)</li>
+      <li><svg width="16" height="16"><text x="0" y="14" font-size="16"></text></svg> <strong>|</strong>: Condicional (A | B)</li>
+      <li><svg width="16" height="16"><text x="0" y="14" font-size="16"></text></svg> <strong>♦</strong>: Diamante</li>
+      <li><svg width="16" height="16"><text x="0" y="14" font-size="16"></text></svg> <strong>♣</strong>: Trébol</li>
+      <li><svg width="16" height="16"><text x="0" y="14" font-size="16"></text></svg> <strong>♠</strong>: Pica</li>
+      <li><svg width="16" height="16"><text x="0" y="14" font-size="16"></text></svg> <strong>♥</strong>: Corazón</li>
+      <li><svg width="16" height="16"><symbol id="heart" viewBox="0 0 32 29.6"></symbol><use href="#heart" fill="red"/></svg> <strong>A</strong></li>
+      <li><svg width="16" height="16"><text x="0" y="14" font-size="16"></text></svg> <strong>J</strong></li>
+      <li><svg width="16" height="16"><text x="0" y="14" font-size="16"></text></svg> <strong>Q</strong></li>
+      <li><svg width="16" height="16"><text x="0" y="14" font-size="16"></text></svg> <strong>K</strong></li>
+    </ul>
+  </div>
+
+  <script>
+    const suits = ['♥', '♦', '♣', '♠'];
+    const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+    function createDeck() {
+      const deck = [];
+      for (const suit of suits) {
+        for (const value of values) {
+          deck.push({ suit, value });
+        }
+      }
+      return deck;
+    }
+
+    function renderDeck() {
+      const cardsContainer = document.getElementById('cards-container');
+      cardsContainer.innerHTML = '';
+      const deck = createDeck();
+
+      // Definir el orden de los valores
+      const valueOrder = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+      // Ordenar el mazo primero por valor y luego por tipo de carta
+      deck.sort((a, b) => {
+        const suitOrder = ['♥', '♦', '♣', '♠']; // Orden de los tipos de carta
+        if (a.value === b.value) {
+          return suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
+        }
+        return valueOrder.indexOf(a.value) - valueOrder.indexOf(b.value);
+      });
+
+      // Crear una estructura de filas por tipo de carta
+      for (const suit of suits) {
+        for (const value of values) {
+          const card = deck.find(c => c.suit === suit && c.value === value);
+          if (card) {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
+            cardElement.textContent = card.value;
+            cardElement.style.color = ['♥', '♦'].includes(card.suit) ? 'red' : 'black';
+            cardElement.setAttribute('data-suit', card.suit);
+            cardsContainer.appendChild(cardElement);
+          }
+        }
+      }
+    }
+
+    function evaluateProbability(query) {
+      const deck = createDeck();
+
+      function tokenize(input) {
+        const tokens = [];
+        const regex = /\s*([()U∪∩~|]|[A-Za-z♥♦♣♠]+|\d+)\s*/g;
+        let match;
+        while ((match = regex.exec(input)) !== null) {
+          tokens.push(match[1]);
+        }
+        return tokens;
+      }
+
+      function parse(tokens) {
+        let position = 0;
+
+        function parseExpression() {
+          let node = parseOr();
+          while (position < tokens.length && tokens[position] === '|') {
+            position++;
+            const condition = parseOr();
+            node = { type: 'CONDITIONAL', left: node, right: condition };
+          }
+          return node;
+        }
+
+        function parseOr() {
+          let node = parseTerm();
+          while (position < tokens.length && (tokens[position] === 'U' || tokens[position] === '∪')) {
+            const operator = tokens[position++];
+            const right = parseTerm();
+            node = { type: 'OR', left: node, right: right };
+          }
+          return node;
+        }
+
+        function parseTerm() {
+          let node = parseFactor();
+          while (position < tokens.length && tokens[position] === '∩') {
+            const operator = tokens[position++];
+            const right = parseFactor();
+            node = { type: 'AND', left: node, right: right };
+          }
+          return node;
+        }
+
+        function parseFactor() {
+          let token = tokens[position];
+          if (token === '~') {
+            position++;
+            const factor = parseFactor();
+            return { type: 'NOT', value: factor };
+          } else if (token === '(') {
+            position++;
+            const expr = parseExpression();
+            if (tokens[position] === ')') {
+              position++;
+            }
+            return expr;
+          } else {
+            position++;
+            return { type: 'VALUE', value: token };
+          }
+        }
+
+        return parseExpression();
+      }
+
+      function evaluate(node) {
+        switch (node.type) {
+          case 'OR':
+            return new Set([...evaluate(node.left), ...evaluate(node.right)]);
+          case 'AND':
+            return new Set([...evaluate(node.left)].filter(x => evaluate(node.right).has(x)));
+          case 'NOT':
+            const all = new Set(deck.map(card => JSON.stringify(card)));
+            const notSet = evaluate(node.value);
+            return new Set([...all].filter(x => !notSet.has(x)));
+          case 'VALUE':
+            return new Set(
+              deck
+                .filter(card => {
+                  const val = node.value.toUpperCase();
+                  switch (val) {
+                    case 'A':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                    case '10':
+                    case 'J':
+                    case 'Q':
+                    case 'K':
+                      return card.value === val;
+                    case 'CORAZON':
+                    case 'HEART':
+                      return card.suit === '♥';
+                    case 'DIAMANTE':
+                    case 'DIAMOND':
+                      return card.suit === '♦';
+                    case 'TREBOL':
+                    case 'CLUB':
+                      return card.suit === '♣';
+                    case 'PICA':
+                    case 'SPIKE':
+                    case 'SPADE':
+                      return card.suit === '♠';
+                    default:
+                      return false;
+                  }
+                })
+                .map(card => JSON.stringify(card))
+            );
+          case 'CONDITIONAL':
+            const A = evaluate(node.left);
+            const B = evaluate(node.right);
+            const intersection = new Set([...A].filter(x => B.has(x)));
+            const probability = B.size === 0 ? 0 : intersection.size / B.size;
+            return { set: intersection, probability: probability };
+          default:
+            return new Set();
+        }
+      }
+
+      try {
+        const tokens = tokenize(query);
+        const ast = parse(tokens);
+        const result = evaluate(ast);
+        
+        if (ast.type === 'CONDITIONAL') {
+          return {
+            set: result.set,
+            probability: result.probability,
+            denominator: new Set([...evaluate(ast.right)]).size
+          };
+        } else {
+          const probability = result.size / deck.length;
+          return {
+            set: result,
+            probability: probability,
+            denominator: deck.length
+          };
+        }
+      } catch (error) {
+        console.error("Error evaluating probability:", error);
+        return { set: new Set(), probability: 0, denominator: 52 };
+      }
+    }
+
+    function updateVisualization(query) {
+      const evaluation = evaluateProbability(query);
+      const matchingCards = Array.from(evaluation.set).map(cardStr => JSON.parse(cardStr));
+      const cards = document.querySelectorAll('.card');
+      const deck = createDeck();
+
+      cards.forEach((cardElement, index) => {
+        const card = deck[index];
+        const isMatching = matchingCards.some(c => c.suit === card.suit && c.value === card.value);
+
+        cardElement.classList.remove('included', 'excluded');
+        if (query.trim() === "") {
+          // Si el input está vacío, no sombrear
+        } else if (isMatching) {
+          cardElement.classList.add('included');
+        } else {
+          cardElement.classList.add('excluded');
+        }
+      });
+
+      let probabilityText = "Probabilidad: ";
+      if (query.trim() === "") {
+        probabilityText += "0% (0 / 52)";
+      } else {
+        if (evaluation.denominator !== 52) {
+          const percentage = (evaluation.probability * 100).toFixed(2);
+          const numerator = matchingCards.length;
+          const denominator = evaluation.denominator;
+          probabilityText += `${percentage}% (${numerator} / ${denominator})`;
+        } else {
+          const probability = evaluation.probability;
+          const percentage = (probability * 100).toFixed(2);
+          const numerator = matchingCards.length;
+          const denominator = deck.length;
+          probabilityText += `${percentage}% (${numerator} / ${denominator})`;
+        }
+      }
+
+      document.getElementById('result').textContent = probabilityText;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderDeck();
+
+      const input = document.getElementById('probability-input');
+      input.addEventListener('input', (e) => {
+        const rawInput = e.target.value;
+        const match = rawInput.match(/P\s*\((.*)\)/i);
+        const expression = match ? match[1] : rawInput;
+        updateVisualization(expression);
+      });
+    });
+  </script>
+  <h2>por @elBrian</h2>
+</body>
+</html>
