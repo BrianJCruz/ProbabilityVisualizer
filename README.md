@@ -1,31 +1,30 @@
-# Card Probability Visualizer
+# Visualizador de Probabilidades con Cartas
 
-A pure html and js card probability visualizer.
+Un visualizador de probabilidades de cartas hecho en HTML y JavaScript. Puedes probarlo aquí: [https://probability-visualizer.netlify.app/](https://probability-visualizer.netlify.app/)
 
-## Overview
+## Descripción General
 
-The **Card Probability Visualizer** is a tool designed to calculate and display the probabilities of drawing specific cards from a deck; useful for educational purposes.
+El **Visualizador de Probabilidades con Cartas** es una herramienta diseñada para calcular y mostrar las probabilidades de extraer cartas específicas de una baraja, útil para fines educativos.
 
-- **Real-Time Probability Calculation**: Updates probabilities as cards are drawn.
-- **Graphical Visualization**: Displays charts or tables for easy interpretation.
-- Uses **conditional probability** to update chances after each draw.
+- **Cálculo de Probabilidades en Tiempo Real**: Actualiza las probabilidades a medida que se extraen cartas.
+- **Visualización Gráfica**: Cada grupo de cartas seleccionadas cambia de color confome al resultado calculado de la probabilidad.
+- Usa **probabilidad condicional** para actualizar las probabilidades después de cada extracción.
 
 <img src="https://github.com/user-attachments/assets/6119e363-06a4-4903-9bae-37c4b369f0e0" width=840>
 
-# Symbol Legend
+# Leyenda de Símbolos
 
-| Symbol | Meaning |
+| Símbolo | Significado |
 |---------|-------------------------------|
-| U       | Union (A ∪ B) |
-| ∩       | Intersection (A ∩ B) |
-| ~       | Negation (~A) |
-| \|      | Conditional (A \| B) |
-| ♦       | Diamond |
-| ♣       | Club |
-| ♠       | Spade |
-| ♥       | Heart |
-| A       | Ace |
-| J       | Jack |
-| Q       | Queen |
-| K       | King |
-
+| U       | Unión (A ∪ B) |
+| ∩       | Intersección (A ∩ B) |
+| ~       | Negación (~A) |
+| \|      | Condicional (A \| B) |
+| ♦       | Diamante |
+| ♣       | Trébol |
+| ♠       | Pica |
+| ♥       | Corazón |
+| A       | As |
+| J       | Jota |
+| Q       | Reina |
+| K       | Rey |
